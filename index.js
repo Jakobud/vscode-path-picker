@@ -15,10 +15,9 @@ const PathPicker = function (options) {
   // Default options
   const defaults = {
     directory: os.homedir(),
-    sort: 'alphabetical',
-    caseSensitive: true,
-    reverse: false,
     hidden: false,
+    reverseSort: false,
+    // caseSensitive: true,
     group: false,
     size: true,
     humanReadable: true
@@ -48,9 +47,10 @@ const PathPicker = function (options) {
           files = removeHidden(files)
         }
 
+        // Add dot dot
         files.unshift('..')
 
-        // Loop through the files
+        // Format file list
         let promises = []
         for (let filename of files) {
           promises.push(new Promise((resolve, reject) => {
@@ -92,42 +92,45 @@ const PathPicker = function (options) {
         }
 
         return Promise.all(promises)
-        .then((items) => {
-          return vscode.window.showQuickPick(items, {
-            placeHolder: basePath
-          })
-          .then((item) => {
-            // Nothing selected
-            if (typeof (item) === 'undefined') {
-              stopLoop = true
-              return reject('No file path selected')
-            }
-            // Navigate to directory
-            if (item.stats.isDirectory()) {
-              basePath = path.resolve(item.fullPath)
-              return resolve()
+          .then((items) => {
             // Group directories together
             if (options.group) {
               items = groupDirectories(items)
             }
 
-            // A file has been selected
-            stopLoop = true
-            selectedPath = item.fullPath
-            return resolve()
-          }, (err) => {
-            return reject(err)
+            // Quick Pick interface
+            return vscode.window.showQuickPick(items, {
+              placeHolder: basePath
+            })
+              .then((item) => {
+                // Nothing selected
+                if (typeof (item) === 'undefined') {
+                  stopLoop = true
+                  return reject(err)
+                }
+                // Navigate to directory
+                if (item.stats.isDirectory()) {
+                  basePath = path.resolve(item.fullPath)
+                  return resolve()
+                }
+
+                // A file has been selected
+                stopLoop = true
+                selectedPath = item.fullPath
+                return resolve()
+              }, (err) => {
+                return reject(err)
+              })
           })
-        })
       })
     })
   })
-  .then(() => {
-    return Promise.resolve(selectedPath)
-  })
-  .catch((err) => {
-    return Promise.reject(err)
-  })
+    .then(() => {
+      return Promise.resolve(selectedPath)
+    })
+    .catch(() => {
+      return Promise.reject()
+    })
 }
 
 /**
@@ -170,6 +173,13 @@ const groupDirectories = items => {
   return tmpDirectories.concat(tmpFiles)
 }
 
+/**
+ * @name promiseWhile
+ * @desc
+ * @param
+ * @param
+ * @returns
+ */
 const promiseWhile = (predicate, action) => {
   function loop () {
     if (!predicate()) return
