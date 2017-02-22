@@ -1,0 +1,11 @@
+{
+  "name": "vscode-path-picker",
+  "version": "0.1.0",
+  "description": "no description",
+  "main": "index.js",
+  "scripts": {
+    "test": "none"
+  },
+  "author": "Jake Wilson",
+  "license": "MIT"
+}
