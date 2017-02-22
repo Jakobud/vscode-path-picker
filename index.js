@@ -17,11 +17,11 @@ const PathPicker = function (options) {
     directory: os.homedir(),
     sort: 'alphabetical',
     caseSensitive: true,
-    groupFolders: false,
     reverse: false,
     showSize: true,
     humanReadableSize: true
     hidden: false,
+    group: false,
   }
 
   // Override default options
@@ -103,6 +103,9 @@ const PathPicker = function (options) {
             if (item.stats.isDirectory()) {
               basePath = path.resolve(item.fullPath)
               return resolve()
+            // Group directories together
+            if (options.group) {
+              items = groupDirectories(items)
             }
 
             // A file has been selected
@@ -139,6 +142,29 @@ const removeHidden = files => {
     tmp.push(file)
   }
   return tmp
+}
+
+/**
+ * @name groupDirectories
+ * @desc
+ * @param
+ * @returns
+ */
+const groupDirectories = items => {
+  let tmpDirectories = []
+  let tmpFiles = []
+  for (let item of items) {
+    // Is it a directory?
+    if (item.stats.isDirectory()) {
+      tmpDirectories.push(item)
+      continue
+    }
+    // Is it a file?
+    if (item.stats.isFile()) {
+      tmpFiles.push(item)
+    }
+  }
+  return tmpDirectories.concat(tmpFiles)
 }
 
 const promiseWhile = (predicate, action) => {
