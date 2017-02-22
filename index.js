@@ -15,13 +15,13 @@ const PathPicker = function (options) {
   // Default options
   const defaults = {
     directory: os.homedir(),
-    hidden: true,
     sort: 'alphabetical',
     caseSensitive: true,
     groupFolders: false,
     reverse: false,
     showSize: true,
     humanReadableSize: true
+    hidden: false,
   }
 
   // Override default options
@@ -41,6 +41,11 @@ const PathPicker = function (options) {
         // Handle error
         if (err) {
           return reject(err)
+        }
+
+        // Filter out hidden files
+        if (!options.hidden) {
+          files = removeHidden(files)
         }
 
         files.unshift('..')
@@ -117,6 +122,23 @@ const PathPicker = function (options) {
   .catch((err) => {
     return Promise.reject(err)
   })
+}
+
+/**
+ * @name removeHidden
+ * @desc
+ * @param
+ * @returns
+ */
+const removeHidden = files => {
+  let tmp = []
+  for (let file of files) {
+    if (_.startsWith(file, '.')) {
+      continue
+    }
+    tmp.push(file)
+  }
+  return tmp
 }
 
 const promiseWhile = (predicate, action) => {
