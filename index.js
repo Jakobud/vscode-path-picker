@@ -18,10 +18,10 @@ const PathPicker = function (options) {
     sort: 'alphabetical',
     caseSensitive: true,
     reverse: false,
-    showSize: true,
-    humanReadableSize: true
     hidden: false,
     group: false,
+    size: true,
+    humanReadable: true
   }
 
   // Override default options
@@ -69,12 +69,15 @@ const PathPicker = function (options) {
               // Append a forward slash to directories
               if (stats.isDirectory() && filename !== '..') {
                 filename += '/'
-              } else if (options.showSize && !stats.isSymbolicLink() && filename !== '..') {
-                // Add human readable file size
-                if (options.humanReadableSize) {
-                  item.description = humanReadableSize(stats.size)
+              }
+
+              // Add file size
+              if (options.size && stats.isFile()) {
+                // Human Readable size
+                if (options.humanReadable) {
+                  item.description = getHumanReadable(stats.size)
                 } else {
-                  // Add Bytes size
+                  // Add size in bytes
                   item.description = stats.size + ' B'
                 }
               }
@@ -175,7 +178,13 @@ const promiseWhile = (predicate, action) => {
   return Promise.resolve().then(loop)
 }
 
-const humanReadableSize = (b) => {
+/**
+ * @name humanReadable
+ * @desc
+ * @param
+ * @returns
+ */
+const getHumanReadable = (b) => {
   let u = 0
   let s = 1024
   while (b >= s || -b >= s) {
