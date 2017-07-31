@@ -100,7 +100,10 @@ const PathPicker = function (options) {
 
             // Quick Pick interface
             return vscode.window.showQuickPick(items, {
-              placeHolder: basePath
+              placeHolder: basePath,
+              onDidSelectItem: item => {
+                item.description = 'hello world'
+              }
             })
               .then((item) => {
                 // Nothing selected
@@ -205,3 +208,4 @@ const getHumanReadable = (b) => {
 }
 
 module.exports = PathPicker
+

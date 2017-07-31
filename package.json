@@ -4,11 +4,15 @@
   "description": "no description",
   "main": "index.js",
   "scripts": {
-    "test": "none"
+    "test": "./node_modules/.bin/mocha test/test.js"
   },
   "author": "Jake Wilson",
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
   }
 }
